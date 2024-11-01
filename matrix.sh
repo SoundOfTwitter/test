@@ -66,7 +66,7 @@ echo 'trusted_proxies:' | tee -a /etc/matrix-synapse/homeserver.yaml
 
 echo '  - 127.0.0.1' | tee -a /etc/matrix-synapse/homeserver.yaml
 
-echo 'enable_registration: true' | tee -a /etc/matrix-synapse/homeserver.yaml
+echo 'enable_registration: false' | tee -a /etc/matrix-synapse/homeserver.yaml
 
 echo "registration_shared_secret: \"$strong_passwd\"" | tee -a /etc/matrix-synapse/homeserver.yaml
 
