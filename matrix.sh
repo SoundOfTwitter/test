@@ -3,7 +3,8 @@
 # 变量设置
 server_IP=$(wget -qO- ifconfig.me)
 # read -p "请输入 server_IP: " server_IP
-read -p "请输入 strong_passwd: " strong_passwd
+# read -p "请输入 strong_passwd: " strong_passwd
+strong_passwd=$(< /dev/urandom tr -dc 'A-Za-z0-9' | head -c 26)
 
 apt update && apt install -y curl gnupg2 software-properties-common lsb-release ca-certificates && curl -L https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg | apt-key add - && echo "deb https://packages.matrix.org/debian/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/matrix-org.list && apt update
 
