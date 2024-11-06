@@ -120,7 +120,7 @@ trusted_proxies:
 
 # Registration and password reset settings
 enable_registration: false  # 禁用公开注册
-registration_shared_secret: \"$strong_passwd\"
+registration_shared_secret: "$strong_passwd"
 password_reset:
   enabled: true  # 启用密码重置功能
   shared_secret: "$shared_secret_key"  # 可选，设置共享密钥保护密码重置功能
