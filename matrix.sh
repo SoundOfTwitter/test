@@ -2,6 +2,8 @@
 
 # 变量设置
 server_IP=$(wget -qO- ifconfig.me)
+# read -p "请输入 server_IP: " server_IP
+# read -p "请输入 strong_passwd: " strong_passwd
 strong_passwd=$(< /dev/urandom tr -dc 'A-Za-z0-9' | head -c 26)
 
 apt update && apt install -y curl gnupg2 software-properties-common lsb-release ca-certificates && curl -L https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg | apt-key add - && echo "deb https://packages.matrix.org/debian/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/matrix-org.list && apt update
@@ -75,56 +77,75 @@ HOMESERVER_FILE="/etc/matrix-synapse/homeserver.yaml"
 
 # 写入新的内容
 cat > "$HOMESERVER_FILE" <<EOL
-# Configuration file for Synapse. 
-#
-# This is a YAML file: see [1] for a quick introduction. Note in particular
-# that *indentation is important*: all the elements of a list or dictionary
-# should have the same indentation.
-#
-# [1] https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
-#
-# For more information on how to configure Synapse, including a complete accounting of
-# each option, go to docs/usage/configuration/config_documentation.md or
-# https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html
-#
-# This is set in /etc/matrix-synapse/conf.d/server_name.yaml for Debian installations.
-server_name: "$server_IP"
+# Homeserver configuration file for Synapse
+# More documentation: https://matrix-org.github.io/synapse/latest/
+
+# Server information
+server_name: "$server_IP"  # 使用公网IP或本地IP（不要使用域名）
 pid_file: "/var/run/matrix-synapse.pid"
+
+# Listeners (this controls which ports Synapse listens on)
 listeners:
   - port: 8008
-    tls: false
+    tls: false  # 关闭TLS，使用自签名证书
     type: http
     x_forwarded: true
-    bind_addresses: ['::1', '127.0.0.1']
+    bind_addresses: ['::1', '127.0.0.1']  # 仅监听本地IP，适用于自签名证书
     resources:
       - names: [client, federation]
         compress: false
+
+# Database configuration
 database:
   name: sqlite3
   args:
     database: /var/lib/matrix-synapse/homeserver.db
+
+# Log file location and logging configuration
 log_config: "/etc/matrix-synapse/log.yaml"
+
+# Media store path
 media_store_path: /var/lib/matrix-synapse/media
+
+# Signing key path (for signing events in the federation)
 signing_key_path: "/etc/matrix-synapse/homeserver.signing.key"
-trusted_key_servers:
-  - server_name: "matrix.org"
+
+# Trusted key servers
+trusted_key_servers: []  # 不与其他Matrix服务器通信，禁用所有信任的服务器
+
+# Trusted proxies (useful for reverse proxies)
 trusted_proxies:
   - 127.0.0.1
-enable_registration: true
-enable_email_verification: true
-registration_shared_secret: "$strong_passwd"
 
+# Registration and password reset settings
+enable_registration: false  # 禁用公开注册
+password_reset:
+  enabled: true  # 启用密码重置功能
+  shared_secret: "$strong_passwd"  # 可选，设置共享密钥保护密码重置功能
+
+# Email configuration for password reset emails
 email:
-  smtp_host: "smtp.163.com"
-  smtp_port: 465
-  smtp_user: "liuxiantao328@163.com"
-  smtp_pass: "VNBGPCYDIJNEUBAS"
-  require_transport_security: true
-  notif_from: "Your App Name <liuxiantao328@163.com>"
-  
-enable_password_reset: true
+  smtp_host: "smtp.163.com"  # 邮件服务器的地址（例如：smtp.gmail.com）
+  smtp_port: 465                   # SMTP服务器端口（587 为常见的安全端口）
+  smtp_user: "liuxiantao328@163.com"  # 用于登录SMTP服务器的邮箱用户名
+  smtp_pass: "VNBGPCYDIJNEUBAS"    # 邮件服务器密码
+  require_transport_security: true    # 是否要求使用TLS
+  notif_from: "Your Matrix Server <no-reply@163.com>"  # 发件人地址
 
-public_baseurl: "https://$server_IP/"
+# Public base URL (This will be used in the links for password resets)
+public_baseurl: "https://$server_IP:8008"  # 你的服务器地址（公网IP）
+
+# Federation settings (disable federation)
+federation:
+  enable: false  # 禁用联邦，不与其他Matrix服务器通信
+
+# Media settings
+media:
+  store_path: "/var/lib/matrix-synapse/media"
+  enable_media_repo: false  # 禁用媒体存储库，适用于不希望使用大量媒体存储的场景
+
+# Other configuration settings
+
 EOL
 
 # 输出成功信息
