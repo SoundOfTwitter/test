@@ -111,6 +111,7 @@ trusted_key_servers:
 trusted_proxies:
   - 127.0.0.1
 enable_registration: true
+enable_email_verification: true
 registration_shared_secret: "$strong_passwd"
 
 email:
