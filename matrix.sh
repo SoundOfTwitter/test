@@ -119,7 +119,7 @@ email:
   smtp_user: "liuxiantao328@163.com"
   smtp_pass: "VNBGPCYDIJNEUBAS"
   require_transport_security: true
-  notif_from: "Your App Name <no-reply@matrix.com>"
+  notif_from: "Your App Name <liuxiantao328@163.com>"
   
 enable_password_reset: true
 
