@@ -5,6 +5,7 @@ server_IP=$(wget -qO- ifconfig.me)
 # read -p "请输入 server_IP: " server_IP
 # read -p "请输入 strong_passwd: " strong_passwd
 strong_passwd=$(< /dev/urandom tr -dc 'A-Za-z0-9' | head -c 26)
+shared_secret_key=$(< /dev/urandom tr -dc 'A-Za-z0-9' | head -c 26)
 
 apt update && apt install -y curl gnupg2 software-properties-common lsb-release ca-certificates && curl -L https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg | apt-key add - && echo "deb https://packages.matrix.org/debian/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/matrix-org.list && apt update
 
@@ -119,9 +120,10 @@ trusted_proxies:
 
 # Registration and password reset settings
 enable_registration: false  # 禁用公开注册
+registration_shared_secret: \"$strong_passwd\"
 password_reset:
   enabled: true  # 启用密码重置功能
-  shared_secret: "$strong_passwd"  # 可选，设置共享密钥保护密码重置功能
+  shared_secret: "$shared_secret_key"  # 可选，设置共享密钥保护密码重置功能
 
 # Email configuration for password reset emails
 email:
